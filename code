@@ -1,0 +1,195 @@
+#include<iostream>
+#include<vector>
+#include<cmath>
+#include<string>
+#include<algorithm>
+#include<set>
+#include <iomanip>
+
+using namespace std;
+
+class Deck{
+public:
+    int mNumar;
+    string mStema;
+    Deck(){
+        mNumar=0;
+        mStema="";
+    }
+    Deck(int nr, string stema):mNumar(nr),mStema(stema){}
+    
+};
+class Person{
+public:
+    string mNume;
+    int mSuma;
+    int mCarti;
+    Person(){
+        mNume="";
+        mSuma=0;
+        mCarti=0;
+    }
+    Person(string nume, int suma):mNume(nume),mSuma(suma),mCarti(0){}
+    
+};
+
+string CheckCards(const vector<Deck*> & v){
+    int ok=0;
+    for(int i=0;i<v.size();i++)
+        if((v[i]->mNumar>=2&&v[i]->mNumar<=14)&&(v[i]->mStema=="rosu"||v[i]->mStema=="negru"||v[i]->mStema=="romb"||v[i]->mStema=="trefla"))
+            ok++;
+    if(ok!=v.size())
+        return "Pachet masluit";
+    set<Deck*>deck1;
+        for(int i=0;i<v.size();i++)
+            deck1.insert(new Deck(v[i]->mNumar,v[i]->mStema));
+    if(ok==v.size()&&deck1.size()==v.size()&&v.size()==52)
+        return "Pachet OK";
+    if(ok==v.size())
+        return "Pregatit pentru Blackjack";
+   return NULL;     
+}
+
+void ShuffleCards(int x1,int  y1,int z1,int x2,int y2,int z2,vector<Deck*>v,int ma){
+    int aux1;
+    string aux2;
+    for (int i = 0; i <50; i++) {
+        z1 = (z1 * x1 + y1) % ma;
+        z2 = (z2 * x2 + y2) % ma;
+        aux1=v[z1]->mNumar;
+        aux2=v[z1]->mStema;
+        v[z1]->mNumar=v[z2]->mNumar;
+        v[z1]->mStema=v[z2]->mStema;
+        v[z2]->mNumar=aux1;
+        v[z2]->mStema=aux2;
+    }
+        
+}
+
+void PlayGame(vector<Deck*>v,vector<Person*>p){
+    int k=0;
+    for(int i=0;i<p.size();i++){
+        p[i]->mCarti=v[k]->mNumar+v[k+1]->mNumar;
+        k=k+2;
+    }
+    
+    int d_carti=v[k]->mNumar+v[k+1]->mNumar;
+    k=k+2;
+    
+    if(d_carti>21){
+        for(int i=0;i<p.size();i++)
+            if(p[i]->mCarti>21)
+               p[i]->mSuma=p[i]->mSuma-10;
+            else
+               p[i]->mSuma=p[i]->mSuma+10; 
+    }
+    else{
+        for(int i=0;i<p.size();i++){
+            while(p[i]->mCarti<=16){
+                p[i]->mCarti=p[i]->mCarti+v[k]->mNumar;
+                k++;
+            }
+        }
+        while(d_carti<=16){
+            d_carti=v[k]->mNumar+d_carti;
+            k++;
+        }
+        
+        if(d_carti>21){ 
+            for(int i=0;i<p.size();i++)
+                if(p[i]->mCarti>21)
+                    p[i]->mSuma=p[i]->mSuma-10;
+                else
+                    p[i]->mSuma=p[i]->mSuma+10; 
+        }
+        else{
+            for(int i=0;i<p.size();i++){
+                if(p[i]->mCarti>d_carti&&p[i]->mCarti<=21)
+                    p[i]->mSuma=p[i]->mSuma+10;
+                if(p[i]->mCarti>21)
+                    p[i]->mSuma=p[i]->mSuma-10;
+                if(p[i]->mCarti<d_carti)
+                p[i]->mSuma=p[i]->mSuma-10;
+            }
+            
+        }   
+    } 
+ 
+}
+
+
+int main(){
+    string command;
+    int NR;
+    char s[30];
+    vector<Deck*>deck;
+    cin>>command;
+    //char ch;
+    if(command=="check_cards"){
+        while(scanf("%d,%s\n",&NR,s)!=EOF)
+           deck.push_back(new Deck(NR,(string)s));
+        cout<<CheckCards(deck)<<endl;
+    }
+    
+    if(command=="shuffle_cards"){
+        int a1,c1,X01;
+        int a2,c2,X02;
+        cin>>a1>>c1>>X01>>a2>>c2>>X02;
+        while(scanf("%d,%s\n",&NR,s)!=EOF)
+           deck.push_back(new Deck(NR,(string)s));
+           int m=deck.size();
+        ShuffleCards(a1,c1,X01,a2,c2,X02,deck,m);
+        for(int i=0;i<deck.size();i++){
+            printf("%d",deck[i]->mNumar);
+            cout<<","<<deck[i]->mStema<<endl;
+        }
+        
+    }
+    if(command=="play_game"){
+       vector<Deck*>pachet;
+       for(int i=2;i<=14;i++){
+          if(i!=11&&i<=10)
+              pachet.push_back(new Deck(i,"rosu"));
+           if(i!=11&&i>10)
+                pachet.push_back(new Deck(10,"rosu"));}
+        for(int i=2;i<=14;i++){
+          if(i!=11&&i<=10)
+              pachet.push_back(new Deck(i,"negru"));
+           if(i!=11&&i>10)
+                pachet.push_back(new Deck(10,"negru"));}
+        for(int i=2;i<=14;i++){
+          if(i!=11&&i<=10)
+              pachet.push_back(new Deck(i,"romb"));
+           if(i!=11&&i>10)
+                pachet.push_back(new Deck(10,"romb"));}
+        for(int i=2;i<=14;i++){
+          if(i!=11&&i<=10)
+              pachet.push_back(new Deck(i,"trefla"));
+           if(i!=11&&i>10)
+                pachet.push_back(new Deck(10,"trefla"));}
+        int n;
+        cin>>n;
+        string num;
+        int sum;
+        vector<Person*>pers;
+        for(int i=0;i<n;i++){
+            cin>>num>>sum;
+            pers.push_back(new Person(num,sum));}
+        int a1,c1,X01;
+        int a2,c2,X02;
+        while(cin>>a1>>c1>>X01>>a2>>c2>>X02){
+           ShuffleCards(a1,c1,X01,a2,c2,X02,pachet,48);
+        PlayGame(pachet,pers);
+        for(int i=0;i<pers.size();i++)
+            if(pers[i]->mSuma<10){
+                pers.erase(pers.begin()+i);
+                i--;
+            }
+            else
+                pers[i]->mCarti=0;
+        }
+    for(int i=0;i<pers.size();i++)
+        cout<<pers[i]->mNume<<": "<<pers[i]->mSuma<<endl; 
+    }
+    return 0;
+}
