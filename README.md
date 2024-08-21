@@ -1,4 +1,4 @@
-# Blackjack-game
+# Blackjack-game C++
 
 O firmă v-a cerut ajutorul pentru a crea un demo al unei aplicații de Blackjack. Blackjack este unul dintre cele mai ușoare jocuri de înțeles cu cărți, regulile fiind următoarele:
 
